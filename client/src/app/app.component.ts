@@ -1,78 +1,74 @@
-import {Component, OnInit} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {tap} from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
+import { BeerService } from './core/services/beer/beer.service';
+import { environment } from 'src/environments/environment.prod';
+import { Beers as MockBeers, StatusBeer } from './core/mock/beer.mock';
+import { Beer } from './core/objects/beer';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'code-challenge';
+  readonly title = environment.title;
+  dataBeers: Beer[] = MockBeers;
+  interval: any = undefined;
 
-  private readonly products = [
-    {
-      id: '1',
-      name: 'Pilsner',
-      minimumTemperature: 4,
-      maximumTemperature: 6,
-    },
-    {
-      id: '2',
-      name: 'IPA',
-      minimumTemperature: 5,
-      maximumTemperature: 6,
-    },
-    {
-      id: '3',
-      name: 'Lager',
-      minimumTemperature: 4,
-      maximumTemperature: 7,
-    },
-    {
-      id: '4',
-      name: 'Stout',
-      minimumTemperature: 6,
-      maximumTemperature: 8,
-    },
-    {
-      id: '5',
-      name: 'Wheat beer',
-      minimumTemperature: 3,
-      maximumTemperature: 5,
-    },
-    {
-      id: '6',
-      name: 'Pale Ale',
-      minimumTemperature: 4,
-      maximumTemperature: 6,
-    },
-  ];
-
-  readonly data: any = {};
-
-  constructor(private httpClient: HttpClient) {
-  }
+  constructor(private beerService: BeerService) {}
 
   ngOnInit(): void {
-    const loadData = () => {
-      this.products.forEach((product) => {
-        this.httpClient.get(`http://localhost:8081/temperature/${product.id}`)
-          .pipe(
-            tap(response => {
-              this.data[product.id] = {
-                ...product,
-                ...response
-              };
-            })
-          ).subscribe();
-      });
-    };
-
-    loadData();
-
-    setInterval(() => {
-      loadData();
+    this.interval = setInterval(() => {
+      this.initializeTemperatures();
     }, 5000);
+  }
+
+  public initializeTemperatures(): void {
+    try {
+      this.dataBeers.map((beer: Beer) => {
+        this.getTemperature(beer);
+      });
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+
+  async getTemperature(beer: Beer) {
+    await this.beerService.get(beer.id).subscribe(
+      (data: any) => {
+        if (data != undefined && data.id == beer.id) {
+          beer.temperature = data.temperature;
+        } else {
+          beer.temperature = 0;
+        }
+      },
+      (error: any) => {
+        console.log(
+          `Exception [ ${error.message} ] getting product information of ${beer.name}`
+        );
+      }
+    );
+  }
+
+  public checkMeasures(index: number, item: Beer) {
+    if (item.temperature < item.minimumTemperature) {
+      item.status = StatusBeer.Low;
+    }
+
+    if (item.temperature > item.maximumTemperature) {
+      item.status = StatusBeer.High;
+    }
+
+    if (
+      item.temperature >= item.minimumTemperature &&
+      item.temperature <= item.maximumTemperature
+    ) {
+      item.status = StatusBeer.Good;
+    }
+
+    return item.status;
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 }

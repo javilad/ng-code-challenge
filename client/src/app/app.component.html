@@ -2,21 +2,17 @@
   <h2>Beers</h2>
   <table>
     <thead>
-    <tr>
-      <th align="left">Product</th>
-      <th align="left">Temperature</th>
-      <th align="left">Status</th>
-    </tr>
+      <tr>
+        <th class="align-left">Product</th>
+        <th class="align-left">Temperature</th>
+        <th class="align-left">Status</th>
+      </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let item of data | keyvalue">
-        <td width="150">{{ $any(item.value).name }}</td>
-        <td width="150">{{ $any(item.value).temperature }}</td>
-        <td width="150">
-          <span *ngIf="$any(item.value).temperature < $any(item.value).minimumTemperature">too low</span>
-          <span *ngIf="$any(item.value).temperature > $any(item.value).maximumTemperature">too high</span>
-          <span *ngIf="$any(item.value).temperature <= $any(item.value).maximumTemperature && $any(item.value).temperature >= $any(item.value).minimumTemperature">all good</span>
-        </td>
+      <tr *ngFor="let beer of dataBeers; trackBy: checkMeasures">
+        <td class="name-column">{{ beer.name }}</td>
+        <td class="temperature-column" data-column="temperature">{{ beer.temperature }}</td>
+        <td class="status-column" data-column="status">{{ beer.status }}</td>
       </tr>
     </tbody>
   </table>
