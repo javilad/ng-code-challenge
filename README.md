@@ -15,7 +15,7 @@
 - I would have liked to make more functional methods for server app that get data from a certain datasource.
 
 ## Approach
-Following some good practices to ensure a good Test Coverage that comes from a Good Coverage, I integrated the Angular Testing Tool where can run code coverage against all code. The result of this operation give me an excellent insight into the status coding practices. The goal defined was 80%, so creating as many test as possible was the plan to reduce the undetected bugs that can have the project. 
+Following some good practices to ensure a good Test-Coverage that comes from a good Code-Coverage, I integrated the Angular Testing Tool where can run code coverage against all code. The result of this operation give me an excellent insight into the status coding practices. The goal defined was 80%, so creating as many test as possible was the plan to reduce the undetected bugs that can have the project. 
 
 ## Test script
 - `ng test --code-coverage` - Run tests and generate report
